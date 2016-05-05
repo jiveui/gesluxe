@@ -1,6 +1,6 @@
-gesluxe
+gesture
 =======
-Inspired by Gestouch ActionScript 3 gesture recognition library
+Port of gesluxe to openfl
 
 ##Supported gestures:
  * Tap
@@ -53,7 +53,3 @@ If you want to try a more complete sample, you can run the test project from thi
  * `haxelib run flow run web`
 
 It should work on every target supported by Luxe. Tested and working on CPP (Window, Mac, iOS, Android) and Web
-
-##Screenshots
-![](https://github.com/josuigoa/gesluxe/blob/master/screenshot1.png)
-![](https://github.com/josuigoa/gesluxe/blob/master/screenshot2.png)

@@ -1,6 +1,6 @@
-package org.gesluxe.core;
+package jive.gestures.core;
 import luxe.Vector;
-import org.gesluxe.utils.GestureUtils;
+import jive.gestures.utils.GestureUtils;
 import snow.Snow;
 
 /**

@@ -1,12 +1,12 @@
-package org.gesluxe.gestures;
+package jive.gestures.core;
 
 import luxe.Emitter;
 import luxe.Events;
 import luxe.Vector;
-import org.gesluxe.core.GesturesManager;
-import org.gesluxe.core.GestureState;
-import org.gesluxe.core.Touch;
-import org.gesluxe.events.GestureEvent;
+import jive.gestures.core.GesturesManager;
+import jive.gestures.core.GestureState;
+import jive.gestures.core.Touch;
+import jive.gestures.events.GestureEvent;
 
 /**
  * ...

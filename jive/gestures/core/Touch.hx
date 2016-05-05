@@ -1,4 +1,4 @@
-package org.gesluxe.core;
+package jive.gestures.core;
 import luxe.Vector;
 
 /**

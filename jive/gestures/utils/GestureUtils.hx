@@ -1,4 +1,4 @@
-package org.gesluxe.utils;
+package jive.gestures.utils;
 
 import phoenix.Vector;
 /**

@@ -1,35 +1,29 @@
-package org.gesluxe.gestures;
+package jive.gestures;
 import luxe.Vector;
-import org.gesluxe.core.GestureState;
-import org.gesluxe.core.Touch;
+import jive.gestures.core.GestureState;
+import jive.gestures.core.Touch;
 
 /**
  * ...
  * @author Josu Igoa
  */
-class TransformGesture extends Gesture
+class ZoomGesture extends Gesture
 {
 	public var slop:Float = Gesture.DEFAULT_SLOP;
+	public var lockAspectRatio:Bool = true;
+	
 	var _touch1:Touch;
 	var _touch2:Touch;
 	var _transformVector:Vector;
-	
-	public var offsetX:Float = 0;
-	public var offsetY:Float = 0;
-	public var rotation:Float = 0;
-	public var scale:Float = 1;
+	var _initialDistance:Float;
+	public var scaleX:Float = 1;
+	public var scaleY:Float = 1;
 
 	public function new(_target_geom:phoenix.geometry.Geometry = null) 
 	{
 		super(_target_geom);
-	}
-	
-	override public function reset()
-	{
-		_touch1 = null;
-		_touch2 = null;
 		
-		super.reset();
+		//scaleX = scaleY = 1;
 	}
 	
 	// --------------------------------------------------------------------------
@@ -48,19 +42,15 @@ class TransformGesture extends Gesture
 		}
 		
 		if (_touchesCount == 1)
+		{
 			_touch1 = touch;
-		else
+		}
+		else// == 2
 		{
 			_touch2 = touch;
+			
 			_transformVector = Vector.Subtract(_touch2.location, _touch1.location);
-		}
-		
-		updateLocation();
-		
-		if (state == GestureState.BEGAN || state == GestureState.CHANGED)
-		{
-			// notify that location (and amount of touches) has changed
-			setState(GestureState.CHANGED);
+			_initialDistance = _transformVector.length;
 		}
 	}
 	
@@ -68,33 +58,50 @@ class TransformGesture extends Gesture
 	{
 		super.onTouchMove(touch);
 		
-		var prevLocation:Vector = location.clone();
-		updateLocation();
+		if (_touchesCount < 2)
+			return;
+		
+		var currTransformVector:Vector = Vector.Subtract(_touch2.location, _touch1.location);
 		
 		if (state == GestureState.POSSIBLE)
 		{
-			if (slop > 0 && touch.locationOffset.length < slop)
+			var d:Float = currTransformVector.length - _initialDistance;
+			var absD:Float = d >= 0 ? d : -d;
+			if (absD < slop)
 			{
 				// Not recognized yet
-				if (_touch2 != null)
-				{
-					// Recalculate _transformVector to avoid initial "jump" on recognize
-					_transformVector = Vector.Subtract(_touch2.location, _touch1.location);
-				}
 				return;
+			}
+			
+			if (slop > 0)
+			{
+				// adjust _transformVector to avoid initial "jump"
+				var slopVector:Vector = currTransformVector.clone();
+				//slopVector.normalize(_initialDistance + (d >= 0 ? slop : -slop));
+				_transformVector = Vector.Multiply(slopVector.normalize(), _initialDistance + (d >= 0 ? slop : -slop));
 			}
 		}
 		
-		offsetX = location.x - prevLocation.x;
-		offsetY = location.y - prevLocation.y;
-		if (_touch2 != null)
+		if (lockAspectRatio)
 		{
-			var currTransformVector = Vector.Subtract(_touch2.location, _touch1.location);
-			rotation = Math.atan2(currTransformVector.y, currTransformVector.x) - Math.atan2(_transformVector.y, _transformVector.x);
-			scale = currTransformVector.length / _transformVector.length;
+			scaleX *= currTransformVector.length / _transformVector.length;
+			scaleY = scaleX;
+		}
+		else
+		{
+			scaleX *= currTransformVector.x / _transformVector.x;
+			scaleY *= currTransformVector.y / _transformVector.y;
 		}
 		
-		setState(state == GestureState.POSSIBLE ? GestureState.BEGAN : GestureState.CHANGED);
+		//_transformVector.x = currTransformVector.x;
+		//_transformVector.y = currTransformVector.y;
+		
+		updateLocation();
+		
+		if (state == GestureState.POSSIBLE)
+			setState(GestureState.BEGAN);
+		else
+			setState(GestureState.CHANGED);
 	}
 	
 	override function onTouchEnd(touch:Touch)
@@ -108,11 +115,12 @@ class TransformGesture extends Gesture
 			else if (state == GestureState.POSSIBLE)
 				setState(GestureState.FAILED);
 		}
-		else// == 1
+		else//== 1
 		{
 			if (touch == _touch1)
+			{
 				_touch1 = _touch2;
-			
+			}
 			_touch2 = null;
 			
 			if (state == GestureState.BEGAN || state == GestureState.CHANGED)
@@ -127,8 +135,6 @@ class TransformGesture extends Gesture
 	{
 		super.resetNotificationProperties();
 		
-		offsetX = offsetY = 0;
-		rotation = 0;
-		scale = 1;
+		scaleX = scaleY = 1;
 	}
 }

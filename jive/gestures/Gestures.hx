@@ -1,17 +1,17 @@
-package org.gesluxe;
+package jive.gestures;
 
 import luxe.Game;
 import luxe.Input.MouseEvent;
 import luxe.Input.TouchEvent;
-import org.gesluxe.core.GesturesManager;
-import org.gesluxe.core.GestureState;
-import org.gesluxe.core.TouchesManager;
+import jive.gestures.core.GesturesManager;
+import jive.gestures.core.GestureState;
+import jive.gestures.core.TouchesManager;
 /**
  * ...
  * @author Josu Igoa
  */
 
-class Gesluxe
+class Gestures
 {
 	static inline var MOUSE_TOUCH_POINT_ID:UInt = 0;
 	static var touchesManager(null, set):TouchesManager;

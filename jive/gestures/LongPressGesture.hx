@@ -1,7 +1,7 @@
-package org.gesluxe.gestures;
+package jive.gestures;
 import luxe.Timer;
-import org.gesluxe.core.GestureState;
-import org.gesluxe.core.Touch;
+import jive.gestures.core.GestureState;
+import jive.gestures.core.Touch;
 
 /**
  * ...

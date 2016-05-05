@@ -1,6 +1,6 @@
-package org.gesluxe.core;
-import org.gesluxe.gestures.Gesture;
-import org.gesluxe.utils.GestureUtils;
+package jive.gestures.core;
+import jive.gestures.gestures.Gesture;
+import jive.gestures.utils.GestureUtils;
 
 /**
  * ...
