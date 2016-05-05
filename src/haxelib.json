@@ -1,0 +1,13 @@
+{
+  "name": "jive-gestures",
+  "url": "https://github.com/jiveui/gestures",
+  "license": "MIT",
+  "tags": [ "GUI", "UI"],
+  "description": "Gestures manager base on openfl",
+  "version": "0.1",
+  "releasenote": "Added flat graphics and data binding to JAccordion, JTable, Dialog and JAdjuster",
+  "contributors": [ "ngrebenshikov" ],
+  "dependencies": {
+    "openfl": ""
+  }
+}
