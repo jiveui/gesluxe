@@ -1,6 +1,7 @@
 package jive.gestures.events;
 import jive.gestures.core.GestureState;
 import jive.gestures.core.Gesture;
+import openfl.events.Event;
 
 /**
  * ...
@@ -12,7 +13,7 @@ typedef GestureEventData = {
 	var newState:GestureState;
 	var oldState:GestureState;
 }
-class GestureEvent
+class GestureEvent extends Event
 {
 	public static inline var GESTURE_POSSIBLE:String = "gesture.possible";
 	public static inline var GESTURE_RECOGNIZED:String = "gesture.recognized";
@@ -24,29 +25,27 @@ class GestureEvent
 	
 	public static inline var GESTURE_STATE_CHANGE:String = "gesture.stateChange";
 	
-	/*
-	public var type:String;
 	public var newState:GestureState;
 	public var oldState:GestureState;
+	public var gesture: Gesture;
 
-	public function new(type:String, newState:GestureState, oldState:GestureState)
+	public function new(type:String, gesture: Gesture, newState:GestureState, oldState:GestureState)
 	{
-		//super(type, false, false);
+		super(type, false, false);
 		
-		this.type = type;
 		this.newState = newState;
 		this.oldState = oldState;
+		this.gesture = gesture;
 	}
 	
-	public function clone():GestureEvent
+	override public function clone():GestureEvent
 	{
-		return new GestureEvent(type, newState, oldState);
+		return new GestureEvent(type, gesture, newState, oldState);
 	}
 	
 	
-	public function toString():String
+	override public function toString():String
 	{
 		return "GestureEvent: " + type + ", " + oldState.toString() + ", " + newState.toString();
 	}
-	*/
 }

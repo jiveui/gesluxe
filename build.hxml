@@ -1,4 +1,0 @@
--main TestMain
--cp ./test_project/src
--lib jive
--lib openfl

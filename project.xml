@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+    <meta title="gestures-tests" package="jive" version="0.0.1" company="Jive" />
+
+    <!-- output -->
+    <app main="jive.gestures.Gestures" file="jive-gestures-tests" path="bin" />
+
+    <window width="1000" height="700" background="0xFFFFFF" fps="60"/>
+
+    <!-- classpath, haxe libs -->
+    <source path="src" />
+
+    <set name="HXCPP_DEBUGGER"/>
+
+    <!--<set name="html5-backend" value="openfl-snapsvg" />-->
+    <haxelib name="openfl" />
+    <haxelib name="mlib" />
+    <haxelib name="hamcrest" />
+    <haxelib name="jive"/>
+    <haxelib name="svg"/>
+    <haxelib name="jive-gestures"/>
+
+</project>

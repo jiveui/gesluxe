@@ -20,7 +20,8 @@ class Gesture {
 	/**
 	 * The geometry element where we want to detect the gesture. If null, it will detect the gesture anywhere.
 	 */
-	public var target: Component;
+	public var target(get, null): Component;
+	public function get_target():Component { return _gesturesManager.target; }
 
 	/**
 	 * Map (generic object) of tracking touch points, where keys are touch points IDs.
@@ -107,7 +108,7 @@ class Gesture {
 		state = GestureState.POSSIBLE;
 		idle = true;
 		
-		_gesturesManager.addGesture(this);
+		// _gesturesManager.addGesture(this);
 	}
 
 	public function init(gesturesManager: GesturesManager) {
@@ -189,6 +190,8 @@ class Gesture {
 			// shortcut for better performance
 			// events.fire(GestureEvent.GESTURE_STATE_CHANGE, { gesture:this, newState:state, oldState:state } );
 			// events.fire(GestureEvent.GESTURE_CHANGED, { gesture:this, newState:state, oldState:state } );
+			target.dispatchEvent(new GestureEvent(GestureEvent.GESTURE_STATE_CHANGE, this, state, state));
+			target.dispatchEvent(new GestureEvent(GestureEvent.GESTURE_CHANGED, this, state, state));
 			// TODO: instead of events should use component as eventdispatcher;
 			
 			resetNotificationProperties();
@@ -266,7 +269,9 @@ class Gesture {
 		
 		// events.fire(GestureEvent.GESTURE_STATE_CHANGE, { gesture:this, newState:state, oldState:oldState } );
 		// events.fire(state.toEventType(), { gesture:this, newState:state, oldState:oldState } );
-		
+		target.dispatchEvent(new GestureEvent(GestureEvent.GESTURE_STATE_CHANGE, this, state, oldState ));
+		target.dispatchEvent(new GestureEvent(state.toEventType(), this, state, oldState ));
+
 		//TODO: instead of events should use component as eventdispatcher
 
 		resetNotificationProperties();

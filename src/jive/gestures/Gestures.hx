@@ -2,9 +2,11 @@ package jive.gestures;
 
 import openfl.events.MouseEvent;
 import openfl.events.TouchEvent;
+import jive.Component;
 import jive.gestures.core.GesturesManager;
 import jive.gestures.core.GestureState;
 import jive.gestures.core.TouchesManager;
+import jive.gestures.core.Gesture;
 /**
  * ...
  * @author Josu Igoa
@@ -13,24 +15,34 @@ import jive.gestures.core.TouchesManager;
 class Gestures
 {
 	static inline var MOUSE_TOUCH_POINT_ID:UInt = 0;
-	static var touchesManager(null, set):TouchesManager;
-	static public function set_touchesManager(tm:TouchesManager):TouchesManager { touchesManager = tm; return tm; }
 
-	static public var gesturesManager:GesturesManager;
-	static var _touchesManager:TouchesManager;
+	public var gesturesManager(default, null):GesturesManager;
+	private var touchesManager:TouchesManager;
+	private var _component: Component;
 
-	public function new()
-	{
+	public function new(component: Component, gs: Array<Gesture> = null)
+	{	
+		gesturesManager = new GesturesManager(component);
+		touchesManager = new TouchesManager(gesturesManager);
+
+		if (gs != null) {
+			for(g in gs) {
+				gesturesManager.addGesture(g);
+			}
+		}
+
+		_component = component;
+
+		_component.addEventListener(TouchEvent.TOUCH_BEGIN, ontouchdown);
+		_component.addEventListener(TouchEvent.TOUCH_MOVE, ontouchmove);
+		_component.addEventListener(TouchEvent.TOUCH_END, ontouchup);
+		_component.addEventListener(MouseEvent.MOUSE_DOWN, onmousedown);
 	}
 
 	static public function init()
 	{
 		GestureState.initStates();
-		gesturesManager = new GesturesManager();
-		_touchesManager = new TouchesManager(gesturesManager);
-
 		
-
 		//#if web
 		// desktop web browsers
 		//Luxe.on(luxe.Ev.mousedown, onmousedown);
@@ -47,7 +59,7 @@ class Gestures
 		//#end
 	}
 
-	static function ontouchdown(event:TouchEvent)
+	private function ontouchdown(event:TouchEvent)
 	{
 		/*
 		 * state : InteractState.down,
@@ -59,57 +71,66 @@ class Gestures
 			dy : y,
 			pos : _touch_pos*/
 		// Original: _touchesManager.onTouchBegin(event.touchPointID, event.pos.x * Luxe.screen.w, event.pos.y * Luxe.screen.h); //, event.target as InteractiveObject);
-		_touchesManager.onTouchBegin(event.touchPointID, event.localX, event.localY); //, event.target as InteractiveObject);
+		touchesManager.onTouchBegin(event.touchPointID, event.localX, event.localY); //, event.target as InteractiveObject);
 	}
 
-	static function ontouchmove(event:TouchEvent)
+	private function ontouchmove(event:TouchEvent)
 	{
-		_touchesManager.onTouchMove(event.touchPointID, event.localX, event.localY);
+		touchesManager.onTouchMove(event.touchPointID, event.localX, event.localY);
 	}
 
-	static function ontouchup(event:TouchEvent)
+	private function ontouchup(event:TouchEvent)
 	{
-		_touchesManager.onTouchEnd(event.touchPointID, event.localX, event.localY);
+		touchesManager.onTouchEnd(event.touchPointID, event.localX, event.localY);
 	}
 
-	static function onmousedown(event:MouseEvent)
+	private function onmousedown(event:MouseEvent)
 	{
-		var touchAccepted:Bool = _touchesManager.onTouchBegin(MOUSE_TOUCH_POINT_ID, event.localX, event.localY);
+		var touchAccepted:Bool = touchesManager.onTouchBegin(MOUSE_TOUCH_POINT_ID, event.localX, event.localY);
 
 		if (touchAccepted)
 			addmouselisteners();
 	}
 
-	static private function onmousemove(event:MouseEvent)
+	private function onmousemove(event:MouseEvent)
 	{
-		_touchesManager.onTouchMove(MOUSE_TOUCH_POINT_ID, event.localX, event.localY);
+		touchesManager.onTouchMove(MOUSE_TOUCH_POINT_ID, event.localX, event.localY);
 	}
 
-	static private function onmouseup(event:MouseEvent)
+	private function onmouseup(event:MouseEvent)
 	{
-		_touchesManager.onTouchEnd(MOUSE_TOUCH_POINT_ID, event.localX, event.localY);
+		touchesManager.onTouchEnd(MOUSE_TOUCH_POINT_ID, event.localX, event.localY);
 
-		if (_touchesManager.activeTouchesCount == 0)
+		if (touchesManager.activeTouchesCount == 0)
 			removemouselisteners();
 	}
 
-	static function addmouselisteners()
+	private function addmouselisteners()
 	{
 		//Luxe.core.emitter.on(luxe.Ev.mousemove, onmousemove);
 		//Luxe.core.emitter.on(luxe.Ev.mouseup, onmouseup);
+		_component.addEventListener(MouseEvent.MOUSE_MOVE, onmousemove);
+		_component.addEventListener(MouseEvent.MOUSE_UP, onmouseup);
 	}
 
-	static function removemouselisteners()
+	private function removemouselisteners()
 	{
 		//Luxe.core.emitter.off(luxe.Ev.mousemove, onmousemove);
 		//Luxe.core.emitter.off(luxe.Ev.mouseup, onmouseup);
+		_component.removeEventListener(MouseEvent.MOUSE_MOVE, onmousemove);
+		_component.removeEventListener(MouseEvent.MOUSE_UP, onmouseup);
 	}
 
-	static public function dispose()
+	public function dispose()
 	{
 		gesturesManager.removeAllGestures();
 		gesturesManager = null;
 		touchesManager = null;
+
+		_component.removeEventListener(TouchEvent.TOUCH_BEGIN, ontouchdown);
+		_component.removeEventListener(TouchEvent.TOUCH_END, ontouchup);
+		_component.removeEventListener(TouchEvent.TOUCH_MOVE, ontouchmove);
+		_component.removeEventListener(MouseEvent.MOUSE_DOWN, onmouseup);
 
 		//Luxe.core.emitter.off(luxe.Ev.touchdown, ontouchdown);
 		//Luxe.core.emitter.off(luxe.Ev.touchmove, ontouchmove);

@@ -1,4 +1,6 @@
 package jive.gestures.core;
+
+import jive.Component;
 import jive.gestures.core.Gesture;
 import jive.gestures.utils.GestureUtils;
 
@@ -12,12 +14,14 @@ class GesturesManager
 	var _gesturesForTouchMap:Map<Touch, Array<Gesture>>;
 	var _dirtyGesturesCount:UInt = 0;
 	var _dirtyGesturesMap:Map<Gesture, Bool>;
+	public var target(default, null): Component;
 	
-	public function new() 
+	public function new(component:Component) 
 	{
 		_gesturesMap = new Map<Gesture, Bool>();
 		_gesturesForTouchMap = new Map<Touch, Array<Gesture>>();
 		_dirtyGesturesMap = new Map<Gesture, Bool>();
+		target = component;
 	}
 	
 	public function addGesture(gesture:Gesture)
@@ -25,6 +29,7 @@ class GesturesManager
 		if (gesture == null)
 			throw "Argument 'gesture' must be not null.";
 		
+		gesture.init(this);
 		_gesturesMap[gesture] = true;
 	}
 	

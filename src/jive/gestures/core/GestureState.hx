@@ -14,7 +14,7 @@ class GestureState
 	public static var CANCELLED:GestureState;
 	public static var FAILED:GestureState;
 	
-	static var allStatesInitialized:Bool;
+	static var allStatesInitialized:Bool = false;
 	
 	var name:String;
 	var eventType:String;
@@ -23,15 +23,20 @@ class GestureState
 	
 	static public function initStates()
 	{
-		POSSIBLE = new GestureState("POSSIBLE");
-		RECOGNIZED = new GestureState("RECOGNIZED", true);
-		BEGAN = new GestureState("BEGAN");
-		CHANGED = new GestureState("CHANGED");
-		ENDED = new GestureState("ENDED", true);
-		CANCELLED = new GestureState("CANCELLED", true);
-		FAILED = new GestureState("FAILED", true);
-		
-		_initClass();
+		try {
+			POSSIBLE = new GestureState("POSSIBLE");
+			RECOGNIZED = new GestureState("RECOGNIZED", true);
+			BEGAN = new GestureState("BEGAN");
+			CHANGED = new GestureState("CHANGED");
+			ENDED = new GestureState("ENDED", true);
+			CANCELLED = new GestureState("CANCELLED", true);
+			FAILED = new GestureState("FAILED", true);
+			
+			_initClass();
+		} catch(e:Dynamic) {
+			// ignore 
+			trace(e);
+		}
 	}
 	
 	public function new(name:String, isEndState:Bool = false)
