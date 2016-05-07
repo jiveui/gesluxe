@@ -1,9 +1,11 @@
 package jive.gestures;
-import luxe.Timer;
-import luxe.Vector;
+import openfl.utils.Timer;
+import openfl.events.TimerEvent;
+import openfl.geom.Vector3D;
 import jive.gestures.core.GestureState;
 import jive.gestures.core.Touch;
 import jive.gestures.utils.GestureUtils;
+import jive.gestures.core.Gesture;
 
 /**
  * ...
@@ -21,13 +23,13 @@ class TapGesture extends Gesture
 	var _timer:Timer;
 	var _numTouchesRequiredReached:Bool;
 	var _tapCounter:UInt = 0;
-	var _touchBeginLocations:Array<Vector>;
+	var _touchBeginLocations:Array<Vector3D>;
 
-	public function new(_target_geom:phoenix.geometry.Geometry = null) 
+	public function new() 
 	{
-		super(_target_geom);
+		super();
 		
-		_touchBeginLocations = new Array<Vector>();
+		_touchBeginLocations = new Array<Vector3D>();
 		canPreventGesture = can_prevent_gesture;
 	}
 	
@@ -65,9 +67,9 @@ class TapGesture extends Gesture
 	{
 		super.preinit();
 		
-		_timer = new Timer(Luxe.core);
+		_timer = new Timer(maxTapDelay, 1);
 		//_timer.schedule(maxTapDelay/1000, timerCompleteHandler);
-		//_timer.addEventListener(TimerEvent.TIMER_COMPLETE, timer_timerCompleteHandler);
+		_timer.addEventListener(TimerEvent.TIMER_COMPLETE, timer_timerCompleteHandler);
 	}
 	
 	

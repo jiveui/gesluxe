@@ -1,7 +1,9 @@
 package jive.gestures;
-import luxe.Timer;
+import openfl.utils.Timer;
+import openfl.events.TimerEvent;
 import jive.gestures.core.GestureState;
 import jive.gestures.core.Touch;
+import jive.gestures.core.Gesture;
 
 /**
  * ...
@@ -21,9 +23,9 @@ class LongPressGesture extends Gesture
 	var _timer:Timer;
 	var _numTouchesRequiredReached:Bool;
 
-	public function new(_target_geom:phoenix.geometry.Geometry = null) 
+	public function new() 
 	{
-		super(_target_geom);
+		super();
 		
 	}
 	
@@ -52,7 +54,8 @@ class LongPressGesture extends Gesture
 	{
 		super.preinit();
 		
-		_timer = new Timer(Luxe.core);
+		_timer = new Timer(minPressDuration, 1);
+		_timer.addEventListener(TimerEvent.TIMER_COMPLETE, timerCompleteHandler);
 	}
 	
 	
@@ -70,8 +73,7 @@ class LongPressGesture extends Gesture
 		{
 			_numTouchesRequiredReached = true;
 			_timer.reset();
-			_timer.schedule(minPressDuration / 1000, timerCompleteHandler);
-			
+			_timer.start();
 		}
 	}
 	
@@ -113,7 +115,7 @@ class LongPressGesture extends Gesture
 	//
 	//--------------------------------------------------------------------------
 	
-	function timerCompleteHandler()
+	function timerCompleteHandler(event:TimerEvent)
 	{
 		if (state == GestureState.POSSIBLE)
 		{

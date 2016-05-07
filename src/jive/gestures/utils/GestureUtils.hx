@@ -1,6 +1,6 @@
 package jive.gestures.utils;
 
-import phoenix.Vector;
+import openfl.geom.Vector3D;
 /**
  * ...
  * @author Josu Igoa
@@ -26,7 +26,7 @@ class GestureUtils
 	public static inline var PI_DOUBLE:Float = 6.28318;
 	//public static inline var GLOBAL_ZERO:Vector = new Vector();
 	
-	static public inline function distance(v2:Vector, v1:Vector):Float
+	static public inline function distance(v2:Vector3D, v1:Vector3D):Float
 	{
 		return Math.sqrt((v2.x - v1.x) * (v2.x - v1.x) + (v2.y - v1.y) * (v2.y - v1.y));
 	}

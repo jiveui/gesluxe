@@ -1,7 +1,8 @@
 package jive.gestures.core;
-import luxe.Vector;
+import openfl.geom.Vector3D;
 import jive.gestures.utils.GestureUtils;
-import snow.Snow;
+import openfl.Lib;
+// import snow.Snow;
 
 /**
  * ...
@@ -25,7 +26,7 @@ class TouchesManager
 		if (_touchesMap.exists(touchID))
 			return false;// touch with specified ID is already registered and being tracked
 		
-		var location = new Vector(x, y);
+		var location = new Vector3D(x, y);
 		
 		for (key in _touchesMap.keys())
 		{
@@ -45,7 +46,7 @@ class TouchesManager
 		var touch:Touch = createTouch();
 		touch.id = touchID;
 		
-		touch.setLocation(x, y, Std.int(Snow.timestamp * 1000));
+		touch.setLocation(x, y, Lib.getTimer());
 		
 		_touchesMap[touchID] = touch;
 		activeTouchesCount++;
@@ -61,7 +62,7 @@ class TouchesManager
 			return;// touch with specified ID isn't registered
 		
 		var touch = _touchesMap.get(touchID);
-		if (touch.updateLocation(x, y, Std.int(Snow.timestamp * 1000)))
+		if (touch.updateLocation(x, y, Lib.getTimer()))
 		{
 			// NB! It appeared that native TOUCH_MOVE event is dispatched also when
 			// the location is the same, but size has changed. We are only interested
@@ -78,7 +79,7 @@ class TouchesManager
 			return;// touch with specified ID isn't registered
 		
 		var touch = _touchesMap.get(touchID);
-		touch.updateLocation(x, y, Std.int(Snow.timestamp * 1000));
+		touch.updateLocation(x, y, Lib.getTimer());
 		
 		_touchesMap.remove(touchID);
 		activeTouchesCount--;
@@ -93,7 +94,7 @@ class TouchesManager
 			return;// touch with specified ID isn't registered
 		
 		var touch = _touchesMap.get(touchID);
-		touch.updateLocation(x, y, Std.int(Snow.timestamp * 1000));
+		touch.updateLocation(x, y, Lib.getTimer());
 		
 		_touchesMap.remove(touchID);
 		activeTouchesCount--;

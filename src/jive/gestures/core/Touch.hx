@@ -1,5 +1,5 @@
 package jive.gestures.core;
-import luxe.Vector;
+import openfl.geom.Vector3D;
 
 /**
  * ...
@@ -20,10 +20,10 @@ class Touch
 	public var sizeY:Float;
 	public var pressure:Float;
 	
-	public var location(get, null):Vector;
-	public var previousLocation(get, null):Vector;
-	public var beginLocation(get, null):Vector;
-	public var locationOffset(get, null):Vector;
+	public var location(get, null):Vector3D;
+	public var previousLocation(get, null):Vector3D;
+	public var beginLocation(get, null):Vector3D;
+	public var locationOffset(get, null):Vector3D;
 	public var time:UInt;
 	public var beginTime:UInt;
 	
@@ -36,7 +36,7 @@ class Touch
 	
 	public function setLocation(x:Float, y:Float, time:UInt)
 	{
-		location = new Vector(x, y);
+		location = new Vector3D(x, y);
 		beginLocation = location.clone();
 		previousLocation = location.clone();
 		
@@ -88,24 +88,24 @@ class Touch
 	
 	/* GETTERS & SETTERS */
 	
-	public function get_location():Vector
+	public function get_location():Vector3D
 	{
 		//return location.clone();
 		return location;
 	}
 	
-	public function get_previousLocation():Vector
+	public function get_previousLocation():Vector3D
 	{
 		return previousLocation.clone();
 	}
 	
-	public function get_beginLocation():Vector
+	public function get_beginLocation():Vector3D
 	{
 		return beginLocation.clone();
 	}
 	
-	public function get_locationOffset():Vector
+	public function get_locationOffset():Vector3D
 	{
-		return Vector.Subtract(location, beginLocation);
+		return location.subtract(beginLocation);
 	}
 }

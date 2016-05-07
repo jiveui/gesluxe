@@ -1,6 +1,6 @@
 package jive.gestures.events;
 import jive.gestures.core.GestureState;
-import jive.gestures.gestures.Gesture;
+import jive.gestures.core.Gesture;
 
 /**
  * ...

@@ -1,9 +1,12 @@
 package jive.gestures;
-import luxe.Timer;
-import luxe.Vector;
+// import luxe.Timer;
+import openfl.geom.Vector3D;
+import openfl.utils.Timer;
+import openfl.events.TimerEvent;
 import jive.gestures.core.GestureState;
 import jive.gestures.core.Touch;
 import jive.gestures.utils.GestureUtils;
+import jive.gestures.core.Gesture;
 
 /**
  * ...
@@ -57,7 +60,7 @@ class SwipeGesture extends Gesture
 	 * Default value is <code>Capabilities.screenDPI / 6</code> and generally should not
 	 * be changed.
 	 */
-	public var minOffset:Vector = new Vector(MIN_OFFSET, MIN_OFFSET);
+	public var minOffset:Vector3D = new Vector3D(MIN_OFFSET, MIN_OFFSET);
 	
 	/**
 	 * Minimum velocity (in pixels per millisecond) for gesture to be recognized.
@@ -67,22 +70,22 @@ class SwipeGesture extends Gesture
 	 * @see #minOffset
 	 * @see #minDuration
 	 */
-	public var minVelocity:Vector = new Vector(MIN_VELOCITY, MIN_VELOCITY);
+	public var minVelocity:Vector3D = new Vector3D(MIN_VELOCITY, MIN_VELOCITY);
 	
 	public var offsetX(get, null):Float;
 	public var offsetY(get, null):Float;
-	var _offset:Vector;
+	var _offset:Vector3D;
 	var _startTime:Int;
 	var _noDirection:Bool;
-	var _avrgVel:Vector;
+	var _avrgVel:Vector3D;
 	var _timer:Timer;
 	
-	public function new(_target_geom:phoenix.geometry.Geometry = null) 
+	public function new() 
 	{
-		super(_target_geom);
+		super();
 		
-		_offset = new Vector();
-		_avrgVel = new Vector();
+		_offset = new Vector3D();
+		_avrgVel = new Vector3D();
 	}
 	
 	override public function reset()
@@ -104,7 +107,8 @@ class SwipeGesture extends Gesture
 	{
 		super.preinit();
 		
-		_timer = new Timer(Luxe.core);
+		_timer = new Timer(maxDuration, 1);
+		_timer.addEventListener(TimerEvent.TIMER_COMPLETE, timerCompleteHandler);
 	}
 	
 	override function onTouchBegin(touch:Touch)
@@ -123,7 +127,7 @@ class SwipeGesture extends Gesture
 			_startTime = touch.time;
 			
 			_timer.reset();
-			_timer.schedule(maxDuration / 1000, timerCompleteHandler);
+			_timer.start();
 		}
 		if (_touchesCount == numTouchesRequired)
 		{

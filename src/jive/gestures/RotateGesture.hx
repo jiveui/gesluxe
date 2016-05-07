@@ -1,7 +1,8 @@
 package jive.gestures;
-import luxe.Vector;
+import openfl.geom.Vector3D;
 import jive.gestures.core.GestureState;
 import jive.gestures.core.Touch;
+import jive.gestures.core.Gesture;
 
 /**
  * ...
@@ -13,14 +14,14 @@ class RotateGesture extends Gesture
 	
 	var _touch1:Touch;
 	var _touch2:Touch;
-	var _transformVector:Vector;
+	var _transformVector:Vector3D;
 	var _thresholdAngle:Float;
 	/** rotation: in radians */
 	public var rotation:Float = 0;
 
-	public function new(_target_geom:phoenix.geometry.Geometry = null) 
+	public function new() 
 	{
-		super(_target_geom);
+		super();
 	}
 	
 	// --------------------------------------------------------------------------
@@ -44,7 +45,7 @@ class RotateGesture extends Gesture
 		{
 			_touch2 = touch;
 			
-			_transformVector = Vector.Subtract(_touch2.location, _touch1.location);
+			_transformVector = _touch2.location.subtract(_touch1.location);
 			
 			// @see chord length formula
 			_thresholdAngle = Math.asin(slop / (2 * _transformVector.length)) * 2;
@@ -59,7 +60,7 @@ class RotateGesture extends Gesture
 		if (_touchesCount < 2)
 			return;
 		
-		var currTransformVector:Vector = Vector.Subtract(_touch2.location, _touch1.location);
+		var currTransformVector:Vector3D = _touch2.location.subtract(_touch1.location);
 		var cross:Float = (_transformVector.x * currTransformVector.y) - (currTransformVector.x * _transformVector.y);
 		var dot:Float = (_transformVector.x * currTransformVector.x) + (_transformVector.y * currTransformVector.y);
 		var rot:Float = Math.atan2(cross, dot);

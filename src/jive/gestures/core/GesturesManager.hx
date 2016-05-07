@@ -1,5 +1,5 @@
 package jive.gestures.core;
-import jive.gestures.gestures.Gesture;
+import jive.gestures.core.Gesture;
 import jive.gestures.utils.GestureUtils;
 
 /**
@@ -50,7 +50,9 @@ class GesturesManager
 		{
 			_dirtyGesturesMap[gesture] = true;
 			_dirtyGesturesCount++;
-			Luxe.next(resetDirtyGestures);
+			// Luxe.next(resetDirtyGestures);
+			// TODO: check 
+			resetDirtyGestures();
 		}
 	}
 	

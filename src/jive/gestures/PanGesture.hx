@@ -1,7 +1,8 @@
 package jive.gestures;
+
 import jive.gestures.core.GestureState;
 import jive.gestures.core.Touch;
-import jive.gestures.gestures.Gesture;
+import jive.gestures.core.Gesture;
 
 /**
  * ...
@@ -23,9 +24,9 @@ class PanGesture extends Gesture
 	public var offsetX:Float = 0;
 	public var offsetY:Float = 0;
 
-	public function new(_target_geom:phoenix.geometry.Geometry = null) 
+	public function new() 
 	{
-		super(_target_geom);
+		super();
 		
 		maxNumTouchesRequired = Std.int(Math.pow(2, 31));
 		minNumTouchesRequired = 1;

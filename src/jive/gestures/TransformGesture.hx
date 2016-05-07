@@ -1,7 +1,9 @@
 package jive.gestures;
-import luxe.Vector;
+
+import openfl.geom.Vector3D;
 import jive.gestures.core.GestureState;
 import jive.gestures.core.Touch;
+import jive.gestures.core.Gesture;
 
 /**
  * ...
@@ -12,16 +14,16 @@ class TransformGesture extends Gesture
 	public var slop:Float = Gesture.DEFAULT_SLOP;
 	var _touch1:Touch;
 	var _touch2:Touch;
-	var _transformVector:Vector;
+	var _transformVector:Vector3D;
 	
 	public var offsetX:Float = 0;
 	public var offsetY:Float = 0;
 	public var rotation:Float = 0;
 	public var scale:Float = 1;
 
-	public function new(_target_geom:phoenix.geometry.Geometry = null) 
+	public function new() 
 	{
-		super(_target_geom);
+		super();
 	}
 	
 	override public function reset()

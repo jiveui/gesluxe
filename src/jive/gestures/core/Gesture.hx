@@ -1,12 +1,15 @@
 package jive.gestures.core;
 
-import luxe.Emitter;
-import luxe.Events;
-import luxe.Vector;
+// import luxe.Emitter;
+// import luxe.Events;
+// import luxe.Vector;
+
+import jive.Component;
 import jive.gestures.core.GesturesManager;
 import jive.gestures.core.GestureState;
 import jive.gestures.core.Touch;
 import jive.gestures.events.GestureEvent;
+import openfl.geom.Vector3D;
 
 /**
  * ...
@@ -17,9 +20,8 @@ class Gesture {
 	/**
 	 * The geometry element where we want to detect the gesture. If null, it will detect the gesture anywhere.
 	 */
-	public var target_geometry:phoenix.geometry.Geometry;
+	public var target: Component;
 
-	public var events:Events;
 	/**
 	 * Map (generic object) of tracking touch points, where keys are touch points IDs.
 	 */
@@ -77,34 +79,39 @@ class Gesture {
 	
 	
 	var _gesturesManager:GesturesManager;
-	var _centralPoint:Vector;
+	var _centralPoint:Vector3D;
 	/**
 	 * List of gesture we require to fail.
 	 * @see requireGestureToFail()
 	 */
 	var _gesturesToFail:Map<Gesture, Bool>;
 	var _pendingRecognizedState:GestureState;
-	public var location(get, null):Vector;
+	public var location(get, null):Vector3D;
 	public var enabled(default, set):Bool;
 	
-	public function new(_target_geom:phoenix.geometry.Geometry = null) 
+	public function new() 
 	{
 		preinit();
 
-		target_geometry = _target_geom;
+		// target_geometry = _target_geom;
 		
         _touchesCount = 0;
-		events = new Events();
-		_gesturesManager = Gesluxe.gesturesManager;
+
+		// events = new Events();
+
 		_touchesMap = new Map<Int, Touch>();
-		_centralPoint = new Vector();
-		location = new Vector();
+		_centralPoint = new Vector3D();
+		location = new Vector3D();
 		_gesturesToFail = new Map<Gesture, Bool>();
 		enabled = true;
 		state = GestureState.POSSIBLE;
 		idle = true;
 		
 		_gesturesManager.addGesture(this);
+	}
+
+	public function init(gesturesManager: GesturesManager) {
+		_gesturesManager = gesturesManager;
 	}
 	
 	/**
@@ -140,12 +147,14 @@ class Gesture {
 	 */
 	function onTouchBegin(touch:Touch)
 	{
-		if (target_geometry != null) {
+		// TODO: check
+
+		//if (target_geometry != null) {
 			// if touch isn't inside of the target geometry, ignore the touch
-			if (!Luxe.utils.geometry.point_in_geometry(touch.location, target_geometry)) {
-				failOrIgnoreTouch(touch);
-			}
-		}
+			//if (!Luxe.utils.geometry.point_in_geometry(touch.location, target_geometry)) {
+				//failOrIgnoreTouch(touch);
+			//}
+		//}
 		
 	}
 	
@@ -178,8 +187,9 @@ class Gesture {
 		if (state == newState && state == GestureState.CHANGED)
 		{
 			// shortcut for better performance
-			events.fire(GestureEvent.GESTURE_STATE_CHANGE, { gesture:this, newState:state, oldState:state } );
-			events.fire(GestureEvent.GESTURE_CHANGED, { gesture:this, newState:state, oldState:state } );
+			// events.fire(GestureEvent.GESTURE_STATE_CHANGE, { gesture:this, newState:state, oldState:state } );
+			// events.fire(GestureEvent.GESTURE_CHANGED, { gesture:this, newState:state, oldState:state } );
+			// TODO: instead of events should use component as eventdispatcher;
 			
 			resetNotificationProperties();
 			
@@ -226,8 +236,9 @@ class Gesture {
 					
 					for (gestureToFail in _gesturesToFail.keys())
 					{
-						gestureToFail.events.listen(GestureEvent.GESTURE_STATE_CHANGE, gestureToFailstateChangeHandler);
-						//gestureToFail.addEventListener(GestureEvent.GESTURE_STATE_CHANGE, gestureToFailstateChangeHandler, false, 0, true);
+						// TODO: fix
+						// gestureToFail.events.listen(GestureEvent.GESTURE_STATE_CHANGE, gestureToFailstateChangeHandler);
+						// gestureToFail.addEventListener(GestureEvent.GESTURE_STATE_CHANGE, gestureToFailstateChangeHandler, false, 0, true);
 					}
 					
 					return false;
@@ -253,9 +264,11 @@ class Gesture {
 		
 		//TODO: what if RTE happens in event handlers?
 		
-		events.fire(GestureEvent.GESTURE_STATE_CHANGE, { gesture:this, newState:state, oldState:oldState } );
-		events.fire(state.toEventType(), { gesture:this, newState:state, oldState:oldState } );
+		// events.fire(GestureEvent.GESTURE_STATE_CHANGE, { gesture:this, newState:state, oldState:oldState } );
+		// events.fire(state.toEventType(), { gesture:this, newState:state, oldState:oldState } );
 		
+		//TODO: instead of events should use component as eventdispatcher
+
 		resetNotificationProperties();
 		if (state == GestureState.BEGAN || state == GestureState.RECOGNIZED)
 		{
@@ -267,7 +280,7 @@ class Gesture {
 	
 	function updateCentralPoint()
 	{
-		var touchLocation:Vector;
+		var touchLocation:Vector3D;
 		var x:Float = 0;
 		var y:Float = 0;
 		for (touch in _touchesMap)
@@ -284,7 +297,8 @@ class Gesture {
 	function updateLocation()
 	{
 		updateCentralPoint();
-		location.set_xy(_centralPoint.x, _centralPoint.y);
+		location.x = _centralPoint.x;
+		location.y = _centralPoint.y;
 	}
 	
 	function resetNotificationProperties()
@@ -317,8 +331,9 @@ class Gesture {
 		
 		for (gestureToFail in _gesturesToFail.keys())
 		{
-			gestureToFail.events.unlisten(GestureEvent.GESTURE_STATE_CHANGE);
-			//gestureToFail.removeEventListener(GestureEvent.GESTURE_STATE_CHANGE, gestureToFailstateChangeHandler);
+			// TODO: fix
+			// gestureToFail.events.unlisten(GestureEvent.GESTURE_STATE_CHANGE);
+			// gestureToFail.removeEventListener(GestureEvent.GESTURE_STATE_CHANGE, gestureToFailstateChangeHandler);
 		}
 		_pendingRecognizedState = null;
 		
@@ -462,7 +477,7 @@ class Gesture {
 	}
 	
 	/* GETTERS & SETTERS */
-	public function get_location():Vector
+	public function get_location():Vector3D
 	{
 		//return location.clone();
 		return location;

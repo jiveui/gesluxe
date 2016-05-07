@@ -1,7 +1,8 @@
 package jive.gestures;
-import luxe.Vector;
+import openfl.geom.Vector3D;
 import jive.gestures.core.GestureState;
 import jive.gestures.core.Touch;
+import jive.gestures.core.Gesture;
 
 /**
  * ...
@@ -14,14 +15,14 @@ class ZoomGesture extends Gesture
 	
 	var _touch1:Touch;
 	var _touch2:Touch;
-	var _transformVector:Vector;
+	var _transformVector:Vector3D;
 	var _initialDistance:Float;
 	public var scaleX:Float = 1;
 	public var scaleY:Float = 1;
 
-	public function new(_target_geom:phoenix.geometry.Geometry = null) 
+	public function new() 
 	{
-		super(_target_geom);
+		super();
 		
 		//scaleX = scaleY = 1;
 	}
@@ -49,7 +50,7 @@ class ZoomGesture extends Gesture
 		{
 			_touch2 = touch;
 			
-			_transformVector = Vector.Subtract(_touch2.location, _touch1.location);
+			_transformVector = _touch2.location.subtract(_touch1.location);
 			_initialDistance = _transformVector.length;
 		}
 	}
@@ -61,7 +62,7 @@ class ZoomGesture extends Gesture
 		if (_touchesCount < 2)
 			return;
 		
-		var currTransformVector:Vector = Vector.Subtract(_touch2.location, _touch1.location);
+		var currTransformVector:Vector3D = _touch2.location.subtract(_touch1.location);
 		
 		if (state == GestureState.POSSIBLE)
 		{
@@ -76,9 +77,10 @@ class ZoomGesture extends Gesture
 			if (slop > 0)
 			{
 				// adjust _transformVector to avoid initial "jump"
-				var slopVector:Vector = currTransformVector.clone();
-				//slopVector.normalize(_initialDistance + (d >= 0 ? slop : -slop));
-				_transformVector = Vector.Multiply(slopVector.normalize(), _initialDistance + (d >= 0 ? slop : -slop));
+				var slopVector:Vector3D = currTransformVector.clone();
+				// TODO : check
+				// slopVector.normalize(_initialDistance + (d >= 0 ? slop : -slop));
+				// _transformVector = Vector.Multiply(slopVector.normalize(), _initialDistance + (d >= 0 ? slop : -slop));
 			}
 		}
 		
