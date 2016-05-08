@@ -3,7 +3,10 @@ package jive.gestures.core;
 import jive.Component;
 import jive.gestures.core.Gesture;
 import jive.gestures.utils.GestureUtils;
-
+import motion.Actuate;
+import openfl.Lib;
+import openfl.events.Event;
+import haxe.CallStack;
 /**
  * ...
  * @author Josu Igoa
@@ -51,18 +54,20 @@ class GesturesManager
 	
 	public function scheduleGestureStateReset(gesture:Gesture)
 	{
+		//trace(CallStack.toString(CallStack.callStack()));
+
 		if (!_dirtyGesturesMap[gesture])
 		{
 			_dirtyGesturesMap[gesture] = true;
 			_dirtyGesturesCount++;
 			// Luxe.next(resetDirtyGestures);
-			// TODO: check 
-			resetDirtyGestures();
+			Lib.current.addEventListener(Event.ENTER_FRAME, enterFrame);
 		}
 	}
 	
 	function resetDirtyGestures()
 	{
+		Lib.current.removeEventListener(Event.ENTER_FRAME, enterFrame);
 		for (gesture in _dirtyGesturesMap.keys())
 		{
 			if (_dirtyGesturesMap[gesture])
@@ -72,6 +77,10 @@ class GesturesManager
 				_dirtyGesturesCount--;
 			}
 		}
+	}
+
+	function enterFrame(event:Event) {
+		resetDirtyGestures();
 	}
 	
 	public function onGestureRecognized(gesture:Gesture)

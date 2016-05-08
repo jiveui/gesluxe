@@ -33,9 +33,10 @@ class Gestures
 
 		_component = component;
 
-		_component.addEventListener(TouchEvent.TOUCH_BEGIN, ontouchdown);
-		_component.addEventListener(TouchEvent.TOUCH_MOVE, ontouchmove);
-		_component.addEventListener(TouchEvent.TOUCH_END, ontouchup);
+		// _component.addEventListener(TouchEvent.TOUCH_BEGIN, ontouchdown);
+		// _component.addEventListener(TouchEvent.TOUCH_MOVE, ontouchmove);
+		// _component.addEventListener(TouchEvent.TOUCH_END, ontouchup);
+		// _component.addEventListener(TouchEvent.TOUCH_OUT, ontouchup);
 		_component.addEventListener(MouseEvent.MOUSE_DOWN, onmousedown);
 	}
 
@@ -111,6 +112,7 @@ class Gestures
 		//Luxe.core.emitter.on(luxe.Ev.mouseup, onmouseup);
 		_component.addEventListener(MouseEvent.MOUSE_MOVE, onmousemove);
 		_component.addEventListener(MouseEvent.MOUSE_UP, onmouseup);
+		_component.addEventListener(MouseEvent.MOUSE_OUT, onmouseup);
 	}
 
 	private function removemouselisteners()
@@ -119,6 +121,7 @@ class Gestures
 		//Luxe.core.emitter.off(luxe.Ev.mouseup, onmouseup);
 		_component.removeEventListener(MouseEvent.MOUSE_MOVE, onmousemove);
 		_component.removeEventListener(MouseEvent.MOUSE_UP, onmouseup);
+		_component.removeEventListener(MouseEvent.MOUSE_OUT, onmouseup);
 	}
 
 	public function dispose()
@@ -130,7 +133,9 @@ class Gestures
 		_component.removeEventListener(TouchEvent.TOUCH_BEGIN, ontouchdown);
 		_component.removeEventListener(TouchEvent.TOUCH_END, ontouchup);
 		_component.removeEventListener(TouchEvent.TOUCH_MOVE, ontouchmove);
+		_component.removeEventListener(TouchEvent.TOUCH_OUT, ontouchup);
 		_component.removeEventListener(MouseEvent.MOUSE_DOWN, onmouseup);
+		_component.removeEventListener(MouseEvent.MOUSE_OUT, onmouseup);
 
 		//Luxe.core.emitter.off(luxe.Ev.touchdown, ontouchdown);
 		//Luxe.core.emitter.off(luxe.Ev.touchmove, ontouchmove);

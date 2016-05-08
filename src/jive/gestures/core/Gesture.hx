@@ -10,18 +10,13 @@ import jive.gestures.core.GestureState;
 import jive.gestures.core.Touch;
 import jive.gestures.events.GestureEvent;
 import openfl.geom.Vector3D;
+import openfl.events.EventDispatcher;
 
 /**
  * ...
  * @author Josu Igoa
  */
-class Gesture {
-
-	/**
-	 * The geometry element where we want to detect the gesture. If null, it will detect the gesture anywhere.
-	 */
-	public var target(get, null): Component;
-	public function get_target():Component { return _gesturesManager.target; }
+class Gesture extends EventDispatcher {
 
 	/**
 	 * Map (generic object) of tracking touch points, where keys are touch points IDs.
@@ -92,6 +87,7 @@ class Gesture {
 	
 	public function new() 
 	{
+		super();
 		preinit();
 
 		// target_geometry = _target_geom;
@@ -188,11 +184,16 @@ class Gesture {
 		if (state == newState && state == GestureState.CHANGED)
 		{
 			// shortcut for better performance
-			// events.fire(GestureEvent.GESTURE_STATE_CHANGE, { gesture:this, newState:state, oldState:state } );
-			// events.fire(GestureEvent.GESTURE_CHANGED, { gesture:this, newState:state, oldState:state } );
-			target.dispatchEvent(new GestureEvent(GestureEvent.GESTURE_STATE_CHANGE, this, state, state));
-			target.dispatchEvent(new GestureEvent(GestureEvent.GESTURE_CHANGED, this, state, state));
-			// TODO: instead of events should use component as eventdispatcher;
+			
+			if (hasEventListener(GestureEvent.GESTURE_STATE_CHANGE))
+			{
+				dispatchEvent(new GestureEvent(GestureEvent.GESTURE_STATE_CHANGE, state, state));
+			}
+			
+			if (hasEventListener(GestureEvent.GESTURE_CHANGED))
+			{
+				dispatchEvent(new GestureEvent(GestureEvent.GESTURE_CHANGED, state, state));
+			}
 			
 			resetNotificationProperties();
 			
@@ -201,7 +202,8 @@ class Gesture {
 		
 		if (!state.canTransitionTo(newState))
 		{
-			throw "You cannot change from state " + state + " to state " + newState  + ".";
+			throw "You cannot change from state " +
+				state + " to state " + newState  + ".";
 		}
 		
 		if (newState != GestureState.POSSIBLE)
@@ -213,6 +215,7 @@ class Gesture {
 		
 		if (newState == GestureState.BEGAN || newState == GestureState.RECOGNIZED)
 		{
+			var gestureToFail:Gesture;
 			// first we check if other required-to-fail gestures recognized
 			// TODO: is this really necessary? using "requireGestureToFail" API assume that
 			// required-to-fail gesture always recognizes AFTER this one.
@@ -237,11 +240,10 @@ class Gesture {
 					// Other gesture might fail soon, so we postpone state change
 					_pendingRecognizedState = newState;
 					
-					for (gestureToFail in _gesturesToFail.keys())
+					for (key in _gesturesToFail.keys())
 					{
-						// TODO: fix
-						// gestureToFail.events.listen(GestureEvent.GESTURE_STATE_CHANGE, gestureToFailstateChangeHandler);
-						// gestureToFail.addEventListener(GestureEvent.GESTURE_STATE_CHANGE, gestureToFailstateChangeHandler, false, 0, true);
+						var gestureToFail = key;
+						gestureToFail.addEventListener(GestureEvent.GESTURE_STATE_CHANGE, gestureToFailstateChangeHandler, false, 0, true);
 					}
 					
 					return false;
@@ -263,18 +265,24 @@ class Gesture {
 		state = newState;
 		
 		if (state.isEndState)
+		{
 			_gesturesManager.scheduleGestureStateReset(this);
+		}
 		
 		//TODO: what if RTE happens in event handlers?
 		
-		// events.fire(GestureEvent.GESTURE_STATE_CHANGE, { gesture:this, newState:state, oldState:oldState } );
-		// events.fire(state.toEventType(), { gesture:this, newState:state, oldState:oldState } );
-		target.dispatchEvent(new GestureEvent(GestureEvent.GESTURE_STATE_CHANGE, this, state, oldState ));
-		target.dispatchEvent(new GestureEvent(state.toEventType(), this, state, oldState ));
-
-		//TODO: instead of events should use component as eventdispatcher
-
+		if (hasEventListener(GestureEvent.GESTURE_STATE_CHANGE))
+		{
+			dispatchEvent(new GestureEvent(GestureEvent.GESTURE_STATE_CHANGE, state, oldState));
+		}
+		
+		if (hasEventListener(state.toEventType()))
+		{
+			dispatchEvent(new GestureEvent(state.toEventType(), state, oldState));
+		}
+		
 		resetNotificationProperties();
+		
 		if (state == GestureState.BEGAN || state == GestureState.RECOGNIZED)
 		{
 			_gesturesManager.onGestureRecognized(this);
@@ -338,7 +346,7 @@ class Gesture {
 		{
 			// TODO: fix
 			// gestureToFail.events.unlisten(GestureEvent.GESTURE_STATE_CHANGE);
-			// gestureToFail.removeEventListener(GestureEvent.GESTURE_STATE_CHANGE, gestureToFailstateChangeHandler);
+			gestureToFail.removeEventListener(GestureEvent.GESTURE_STATE_CHANGE, gestureToFailstateChangeHandler);
 		}
 		_pendingRecognizedState = null;
 		

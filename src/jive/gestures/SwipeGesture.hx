@@ -7,6 +7,8 @@ import jive.gestures.core.GestureState;
 import jive.gestures.core.Touch;
 import jive.gestures.utils.GestureUtils;
 import jive.gestures.core.Gesture;
+import openfl.system.Capabilities;
+import haxe.CallStack;
 
 /**
  * ...
@@ -27,8 +29,8 @@ class SwipeGesture extends Gesture
 	//
 	
 	private static inline var ANGLE:Float = 40 * GestureUtils.DEGREES_TO_RADIANS;
-	private static inline var MAX_DURATION:UInt = 500;
-	private static inline var MIN_OFFSET:Float = 42.3; // Capabilities.screenDPI / 6;
+	private static inline var MAX_DURATION:UInt = 100;
+	private static var MIN_OFFSET:Float =  42.6;// 32.6; // Capabilities.screenDPI / 6;
 	private static var MIN_VELOCITY:Float = 2 * MIN_OFFSET / MAX_DURATION;
 	
 	/**
@@ -79,11 +81,16 @@ class SwipeGesture extends Gesture
 	var _noDirection:Bool;
 	var _avrgVel:Vector3D;
 	var _timer:Timer;
+	var isRecognized: Bool;
 	
 	public function new() 
 	{
 		super();
-		
+		// trace('screenDpi=' + Capabilities.screenDPI);
+		// trace('MIN_OFFSET=$MIN_OFFSET');
+		// trace('MIN_OFFSET=$MIN_OFFSET');
+		// trace('slop=$slop');
+
 		_offset = new Vector3D();
 		_avrgVel = new Vector3D();
 	}
@@ -115,6 +122,8 @@ class SwipeGesture extends Gesture
 	{
 		super.onTouchBegin(touch);
 		
+		isRecognized = false;
+
 		if (_touchesCount > numTouchesRequired)
 		{
 			failOrIgnoreTouch(touch);
@@ -126,7 +135,11 @@ class SwipeGesture extends Gesture
 			// Because we want to fail as quick as possible
 			_startTime = touch.time;
 			
+			// trace('start time = $_startTime');
+
 			_timer.reset();
+			_timer.delay = maxDuration;
+			_timer.repeatCount = 1;
 			_timer.start();
 		}
 		if (_touchesCount == numTouchesRequired)
@@ -147,6 +160,10 @@ class SwipeGesture extends Gesture
 			return;
 		
 		var totalTime:Int = touch.time - _startTime;
+
+		// trace('total time = $totalTime');
+		
+
 		if (totalTime == 0)
 			return;//It was somehow THAT MUCH performant on one Android tablet
 		
@@ -161,6 +178,7 @@ class SwipeGesture extends Gesture
 		// average velocity (total offset to total duration)
 		_avrgVel.x = _offset.x / totalTime;
 		_avrgVel.y = _offset.y / totalTime;
+
 		var avrgVel:Float = _avrgVel.length;
 		
 		if (_noDirection)
@@ -168,7 +186,8 @@ class SwipeGesture extends Gesture
 			if ((offsetLength > slop || slop != slop) &&
 				((avrgVel >= minVelocity.x || avrgVel >= minVelocity.y) && (offsetLength >= minOffset.x || offsetLength >= minOffset.y)))
 			{
-				setState(GestureState.RECOGNIZED);
+				// setState(GestureState.RECOGNIZED);
+				isRecognized = true;
 			}
 		}
 		else
@@ -176,13 +195,15 @@ class SwipeGesture extends Gesture
 			var recentOffsetX:Float = _centralPoint.x - prevCentralPointX;
 			var recentOffsetY:Float = _centralPoint.y - prevCentralPointY;
 			//faster Math.abs()
-			var absVelX:Float = _avrgVel.x > 0 ? _avrgVel.x : -_avrgVel.x;
-			var absVelY:Float = _avrgVel.y > 0 ? _avrgVel.y : -_avrgVel.y;
+			var absVelX:Float = Math.abs(_avrgVel.x);
+			var absVelY:Float = Math.abs(_avrgVel.y);
 			
+			// trace('absVel = ($absVelX, $absVelY), $_offset, $minVelocity');
+
 			if (absVelX > absVelY) // horizontal swipe detected
 			{
-				var absOffsetX:Float = _offset.x > 0 ? _offset.x : -_offset.x;
-				
+				var absOffsetX:Float = Math.abs(_offset.x);
+				// trace(absOffsetX);
 				if (absOffsetX > slop || slop != slop)//faster isNaN()
 				{
 					if ((recentOffsetX < 0 && (direction & LEFT) == 0) ||
@@ -191,18 +212,21 @@ class SwipeGesture extends Gesture
 					{
 						// movement in opposite direction
 						// or too much diagonally
+						// trace('failed');
 						setState(GestureState.FAILED);
 					}
 					else if (absVelX >= minVelocity.x && absOffsetX >= minOffset.x)
 					{
 						_offset.y = 0;
-						setState(GestureState.RECOGNIZED);
+						isRecognized = true;
+						// setState(GestureState.RECOGNIZED);
 					}
 				}
 			}
 			else if (absVelY > absVelX) // vertical swipe detected
 			{
-				var absOffsetY:Float = _offset.y > 0 ? _offset.y : -_offset.y;
+				var absOffsetY:Float = Math.abs(_offset.y);
+
 				if (absOffsetY > slop || slop != slop)//faster isNaN()
 				{
 					if ((recentOffsetY < 0 && (direction & UP) == 0) ||
@@ -211,19 +235,23 @@ class SwipeGesture extends Gesture
 					{
 						// movement in opposite direction
 						// or too much diagonally
+						// trace('failed');
 						
 						setState(GestureState.FAILED);
 					}
 					else if (absVelY >= minVelocity.y && absOffsetY >= minOffset.y)
 					{
 						_offset.x = 0;
-						setState(GestureState.RECOGNIZED);
+						isRecognized = true;
+						// setState(GestureState.RECOGNIZED);
 					}
 				}
 			}
 			// Give some tolerance for accidental offset on finger press (slop)
-			else if (offsetLength > slop || slop != slop)//faster isNaN()
+			else if (offsetLength > slop || slop != slop) {//faster isNaN()
+				// trace('failed');
 				setState(GestureState.FAILED);
+			}
 		}
 	}
 	
@@ -231,8 +259,12 @@ class SwipeGesture extends Gesture
 	{
 		super.onTouchEnd(touch);
 		
-		if (_touchesCount < numTouchesRequired)
-			setState(GestureState.FAILED);
+		if (_touchesCount < numTouchesRequired){
+			if (isRecognized)
+				setState(GestureState.RECOGNIZED);
+			else
+				setState(GestureState.FAILED);
+		}
 	}
 	
 	override function resetNotificationProperties()
@@ -249,8 +281,9 @@ class SwipeGesture extends Gesture
 	//
 	//--------------------------------------------------------------------------
 	
-	function timerCompleteHandler()
+	function timerCompleteHandler(event:TimerEvent)
 	{
+		// trace('timer complete handler $state');
 		if (state == GestureState.POSSIBLE)
 			setState(GestureState.FAILED);
 	}

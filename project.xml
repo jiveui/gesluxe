@@ -18,6 +18,7 @@
     <haxelib name="hamcrest" />
     <haxelib name="jive"/>
     <haxelib name="svg"/>
+    <haxelib name="actuate"/>
     <haxelib name="jive-gestures"/>
 
 </project>

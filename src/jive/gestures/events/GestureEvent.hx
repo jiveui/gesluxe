@@ -27,20 +27,18 @@ class GestureEvent extends Event
 	
 	public var newState:GestureState;
 	public var oldState:GestureState;
-	public var gesture: Gesture;
 
-	public function new(type:String, gesture: Gesture, newState:GestureState, oldState:GestureState)
+	public function new(type:String, newState:GestureState, oldState:GestureState)
 	{
 		super(type, false, false);
 		
 		this.newState = newState;
 		this.oldState = oldState;
-		this.gesture = gesture;
 	}
 	
 	override public function clone():GestureEvent
 	{
-		return new GestureEvent(type, gesture, newState, oldState);
+		return new GestureEvent(type, newState, oldState);
 	}
 	
 	
